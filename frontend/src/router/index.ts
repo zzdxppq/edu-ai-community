@@ -15,6 +15,16 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/admin',
+      component: () => import('@/views/admin/AdminLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        { path: '', redirect: '/admin/knowledge' },
+        { path: 'knowledge', name: 'AdminKnowledge', component: () => import('@/views/admin/KnowledgeManage.vue') },
+        { path: 'feedback', name: 'AdminFeedback', component: () => import('@/views/admin/FeedbackManage.vue') }
+      ]
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/'
     }

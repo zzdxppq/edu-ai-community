@@ -1,4 +1,4 @@
-import type { QuickQuestion, Citation, UserRole } from '@/types'
+import type { QuickQuestion, Citation, UserRole, KnowledgeItem, FeedbackItem, DocumentFile } from '@/types'
 
 export const mockQuickQuestions: QuickQuestion[] = [
   { id: 1, text: '校共体的基本组织架构是什么？' },
@@ -182,4 +182,36 @@ export const mockPolicyNews = [
 export const mockCases = [
   { id: 1, title: '洛阳市"1+1+N"校共体建设典型经验' },
   { id: 2, title: '信阳市乡村学校数字化教学资源应用案例' }
+]
+
+export const mockKnowledgeItems: KnowledgeItem[] = [
+  { id: 'ki-001', title: '校共体基本组织架构说明', content: '校共体采用"1+1+N"的基本组织模式，即1所城镇优质学校（牵头校）+1所城镇学校+N所乡村学校共同组建。管理层级包括决策层（理事会）、执行层（办公室）、业务层（工作组）。', source: 'file', sourceFile: '河南省校共体建设指南.pdf', status: 'active', createdAt: '2026-02-10T08:00:00Z', updatedAt: '2026-03-01T10:00:00Z' },
+  { id: 'ki-002', title: '城乡结对帮扶三种模式', content: '主要采用三种结对模式：1+1模式（一对一）、1+1+N模式（联合帮扶）、1+N模式（一校辐射多校）。帮扶内容涵盖教学、管理、师资、资源四个方面。', source: 'file', sourceFile: '河南省校共体建设指南.pdf', status: 'active', createdAt: '2026-02-10T08:30:00Z', updatedAt: '2026-03-01T10:30:00Z' },
+  { id: 'ki-003', title: '教师交流轮岗比例与期限要求', content: '每年交流轮岗教师比例不低于符合条件教师总数的10%，其中骨干教师不低于交流总数的20%。交流轮岗期限一般为1-3年。', source: 'file', sourceFile: '教师交流轮岗实施办法.docx', status: 'active', createdAt: '2026-02-12T09:00:00Z', updatedAt: '2026-02-28T14:00:00Z' },
+  { id: 'ki-004', title: '校共体建设评估五维度指标', content: '评估维度包括：组织管理（20分）、教育教学（30分）、师资发展（20分）、资源共享（15分）、发展成效（15分）。采用自评+县评+省抽查三级评估方式。', source: 'manual', status: 'active', createdAt: '2026-02-15T11:00:00Z', updatedAt: '2026-03-05T09:00:00Z' },
+  { id: 'ki-005', title: '数字化资源共享"三个课堂"建设', content: '通过专递课堂、名师课堂、名校网络课堂实现优质教育资源实时共享。鼓励有条件的校共体建设同步课堂，实现城乡学校同上一堂课。', source: 'qa', status: 'active', createdAt: '2026-02-18T14:00:00Z', updatedAt: '2026-03-08T16:00:00Z' },
+  { id: 'ki-006', title: '校共体经费使用范围与管理', content: '经费主要用于教师交流轮岗补贴、联合教研活动经费、数字化资源建设、教师培训研修费用、管理运行费用等。实行专账管理，专款专用。', source: 'file', sourceFile: '校共体专项资金管理办法.pdf', status: 'active', createdAt: '2026-02-20T10:00:00Z', updatedAt: '2026-03-10T11:00:00Z' },
+  { id: 'ki-007', title: '乡村学校教师培训支持政策', content: '校共体为乡村教师提供跟岗学习、名师工作室共建、集体备课、线上研修等多种培训方式，促进乡村教师专业成长。', source: 'qa', status: 'pending', createdAt: '2026-03-01T09:00:00Z', updatedAt: '2026-03-12T10:00:00Z' },
+  { id: 'ki-008', title: '牵头校引领示范职责', content: '牵头校负责统筹校共体年度工作计划、组织联合教研活动、输出管理经验、协调资源分配。需发挥示范引领作用，带动成员校共同发展。', source: 'manual', status: 'pending', createdAt: '2026-03-05T08:00:00Z', updatedAt: '2026-03-14T09:00:00Z' },
+  { id: 'ki-009', title: '校共体课程资源共建方案', content: '各成员校按学科分工共建课程资源库，包括优质课件、教学设计、微课视频、试题库等。依托省级资源平台实现"一校上传、多校共享"。', source: 'file', sourceFile: '课程资源共建方案.docx', status: 'inactive', createdAt: '2026-01-20T10:00:00Z', updatedAt: '2026-02-15T14:00:00Z' },
+  { id: 'ki-010', title: '校共体内部沟通协调机制', content: '建立定期会议制度（月度例会、学期总结会）、信息通报制度、问题反馈机制。利用微信群、钉钉等工具保持日常沟通，确保信息畅通。', source: 'manual', status: 'active', createdAt: '2026-03-08T11:00:00Z', updatedAt: '2026-03-15T16:00:00Z' }
+]
+
+export const mockFeedbackItems: FeedbackItem[] = [
+  { id: 'fb-001', messageId: 'msg-101', userId: 1, username: '张老师', userRole: 'LEAD_SCHOOL', rating: 5, reasons: ['内容准确'], comment: '回答非常详细，对校共体组织架构的描述很清晰。', escalated: false, escalateStatus: null, question: '校共体的基本组织架构是什么？', answer: '校共体采用"1+1+N"的基本组织模式...', conversationId: 'conv-1', createdAt: '2026-03-15T10:30:00Z' },
+  { id: 'fb-002', messageId: 'msg-102', userId: 2, username: '李主任', userRole: 'REGIONAL_ADMIN', rating: 4, reasons: ['内容准确', '引用可靠'], comment: '信息比较全面，但希望能提供更多地方案例。', escalated: false, escalateStatus: null, question: '区域校共体建设的推进策略有哪些？', answer: '区域校共体建设需要从顶层设计、资源配置、考核评价等方面系统推进...', conversationId: 'conv-2', createdAt: '2026-03-14T14:20:00Z' },
+  { id: 'fb-003', messageId: 'msg-103', userId: 3, username: '王校长', userRole: 'MEMBER_RURAL', rating: 2, reasons: ['内容不准确', '缺少引用'], comment: '关于乡村学校经费补助的回答与实际政策不符，建议核实后更新。', escalated: true, escalateStatus: 'pending', question: '乡村学校参与校共体能获得哪些经费支持？', answer: '乡村学校可以获得交通补贴、培训经费等支持...', conversationId: 'conv-3', createdAt: '2026-03-13T09:15:00Z' },
+  { id: 'fb-004', messageId: 'msg-104', userId: 4, username: '赵研究员', userRole: 'RESEARCHER', rating: 3, reasons: ['不够详细'], comment: '对校共体建设理论基础的阐述不够深入，缺少学术文献支撑。', escalated: false, escalateStatus: null, question: '校共体建设的理论基础有哪些？', answer: '校共体建设主要基于教育公平理论、协同发展理论等...', conversationId: 'conv-4', createdAt: '2026-03-12T16:45:00Z' },
+  { id: 'fb-005', messageId: 'msg-105', userId: 5, username: '刘老师', userRole: 'MEMBER_URBAN', rating: 1, reasons: ['答非所问', '内容不准确'], comment: '我问的是城镇学校如何参与结对帮扶，回答的却是乡村学校的内容，完全不对。', escalated: true, escalateStatus: 'processing', question: '城镇学校如何参与校共体结对帮扶？', answer: '城镇学校在校共体中主要承担资源输出的角色...', conversationId: 'conv-5', createdAt: '2026-03-11T11:00:00Z' },
+  { id: 'fb-006', messageId: 'msg-106', userId: 6, username: '陈副校长', userRole: 'LEAD_SCHOOL', rating: 5, reasons: ['内容准确', '引用可靠', '很有帮助'], comment: '关于联合教研活动的组织方式解释得非常好，已经在学校推广使用了。', escalated: false, escalateStatus: null, question: '校共体联合教研活动如何组织？', answer: '联合教研活动可通过同课异构、集体备课、主题研讨等方式开展...', conversationId: 'conv-6', createdAt: '2026-03-10T13:30:00Z' },
+  { id: 'fb-007', messageId: 'msg-107', userId: 7, username: '孙主任', userRole: 'REGIONAL_ADMIN', rating: 2, reasons: ['信息过时'], comment: '引用的文件已经更新了新版本，建议及时更新知识库。', escalated: true, escalateStatus: 'completed', question: '校共体考核评估方案如何制定？', answer: '根据2024年版评估方案，考核维度包括...', conversationId: 'conv-7', createdAt: '2026-03-09T08:20:00Z' },
+  { id: 'fb-008', messageId: 'msg-108', userId: 8, username: '周老师', userRole: 'MEMBER_RURAL', rating: 4, reasons: ['很有帮助'], comment: '对数字化资源使用的说明很实用，帮助我们学校快速上手了在线教学平台。', escalated: false, escalateStatus: null, question: '数字化教学资源在乡村学校如何应用？', answer: '乡村学校可通过省级资源平台获取优质课件、微课视频等资源...', conversationId: 'conv-8', createdAt: '2026-03-08T15:10:00Z' }
+]
+
+export const mockDocumentFiles: DocumentFile[] = [
+  { id: 'doc-001', fileName: '河南省校共体建设指南.pdf', fileSize: 2458624, fileType: 'pdf', status: 'completed', itemCount: 15, uploadedAt: '2026-02-10T08:00:00Z' },
+  { id: 'doc-002', fileName: '教师交流轮岗实施办法.docx', fileSize: 1245184, fileType: 'docx', status: 'completed', itemCount: 8, uploadedAt: '2026-02-12T09:00:00Z' },
+  { id: 'doc-003', fileName: '校共体专项资金管理办法.pdf', fileSize: 1867776, fileType: 'pdf', status: 'completed', itemCount: 12, uploadedAt: '2026-02-20T10:00:00Z' },
+  { id: 'doc-004', fileName: '课程资源共建方案.docx', fileSize: 983040, fileType: 'docx', status: 'completed', itemCount: 6, uploadedAt: '2026-01-20T10:00:00Z' },
+  { id: 'doc-005', fileName: '2026年校共体工作计划.pdf', fileSize: 3145728, fileType: 'pdf', status: 'parsing', itemCount: 0, uploadedAt: '2026-03-16T14:00:00Z' }
 ]

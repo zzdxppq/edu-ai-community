@@ -5,7 +5,10 @@ import {
   mockQAPairs,
   mockDefaultAnswer,
   mockConversations,
-  mockHistoryMessages
+  mockHistoryMessages,
+  mockKnowledgeItems,
+  mockDocumentFiles,
+  mockFeedbackItems
 } from './data'
 
 function delay(ms: number): Promise<void> {
@@ -136,4 +139,42 @@ export async function mockEscalate(_messageId: string): Promise<{ success: boole
 export async function mockGetRecommendations(role: UserRole): Promise<string[]> {
   await delay(100)
   return mockRoleRecommendations[role] || mockRoleRecommendations.OTHER
+}
+
+export async function mockGetKnowledgeItems() {
+  await delay(200)
+  return [...mockKnowledgeItems]
+}
+
+export async function mockAddKnowledgeItem(data: { title: string; content: string; source: string }) {
+  await delay(300)
+  return { id: 'ki-' + Date.now(), ...data, status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+}
+
+export async function mockUpdateKnowledgeItem(id: string, data: any) {
+  await delay(300)
+  return { id, ...data, updatedAt: new Date().toISOString() }
+}
+
+export async function mockDeleteKnowledgeItem(_id: string) {
+  await delay(200)
+}
+
+export async function mockGetDocumentFiles() {
+  await delay(200)
+  return [...mockDocumentFiles]
+}
+
+export async function mockUploadDocument(fileName: string, fileSize: number, fileType: string) {
+  await delay(1500)
+  return { id: 'doc-' + Date.now(), fileName, fileSize, fileType, status: 'completed', itemCount: Math.floor(Math.random() * 20) + 5, uploadedAt: new Date().toISOString() }
+}
+
+export async function mockGetFeedbackItems() {
+  await delay(200)
+  return [...mockFeedbackItems]
+}
+
+export async function mockUpdateFeedbackStatus(_id: string, _status: string) {
+  await delay(300)
 }

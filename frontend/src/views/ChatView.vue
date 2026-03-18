@@ -35,6 +35,10 @@
             <el-icon :size="20"><Plus /></el-icon>
           </el-button>
 
+          <el-button text @click="router.push('/admin')" class="desktop-only">
+            <el-icon><Setting /></el-icon>
+            <span>运营后台</span>
+          </el-button>
           <div class="user-info desktop-only">
             <el-avatar :size="32" class="user-avatar">
               <el-icon><User /></el-icon>
@@ -167,7 +171,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Clock, Plus, User, SwitchButton, Operation, Monitor, Promotion } from '@element-plus/icons-vue'
+import { Clock, Plus, User, SwitchButton, Operation, Monitor, Promotion, Setting } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { useChatStore } from '@/stores/chat'
 import { mockGetRecommendations } from '@/mock'

@@ -60,3 +60,41 @@ export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   RESEARCHER: '从事教育政策研究与学术分析',
   OTHER: '关注校共体建设的其他人员'
 }
+
+export interface KnowledgeItem {
+  id: string
+  title: string
+  content: string
+  source: 'file' | 'qa' | 'manual'
+  sourceFile?: string
+  status: 'active' | 'pending' | 'inactive'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface FeedbackItem {
+  id: string
+  messageId: string
+  userId: number
+  username: string
+  userRole: UserRole
+  rating: number
+  reasons: string[]
+  comment: string
+  escalated: boolean
+  escalateStatus: 'pending' | 'processing' | 'completed' | null
+  question: string
+  answer: string
+  conversationId: string
+  createdAt: string
+}
+
+export interface DocumentFile {
+  id: string
+  fileName: string
+  fileSize: number
+  fileType: 'pdf' | 'docx'
+  status: 'parsing' | 'completed' | 'failed'
+  itemCount: number
+  uploadedAt: string
+}
