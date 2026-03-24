@@ -1,0 +1,1 @@
+const E={REGIONAL_ADMIN:"区域教育管理人员",LEAD_SCHOOL:"校共体核心牵头校人员",MEMBER_URBAN:"校共体成员校人员（城镇）",MEMBER_RURAL:"校共体成员校人员（乡村）",RESEARCHER:"研究人员",OTHER:"其他人员"},R={REGIONAL_ADMIN:"负责区域教育统筹管理与政策落实",LEAD_SCHOOL:"作为核心校统筹校共体各项工作",MEMBER_URBAN:"城镇学校参与校共体协同发展",MEMBER_RURAL:"乡村学校借助校共体提升教育质量",RESEARCHER:"从事教育政策研究与学术分析",OTHER:"关注校共体建设的其他人员"};export{E as R,R as a};
