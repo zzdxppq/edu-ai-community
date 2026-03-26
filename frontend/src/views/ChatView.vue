@@ -129,8 +129,8 @@
             <el-input
               v-model="inputText"
               type="textarea"
-              :rows="1"
-              :autosize="{ minRows: 1, maxRows: 4 }"
+              :rows="3"
+              :autosize="{ minRows: 3, maxRows: 12 }"
               placeholder="输入您的问题..."
               resize="none"
               @keydown="handleKeydown"
@@ -388,7 +388,7 @@ function handleLogout() {
 }
 
 .messages-list {
-  max-width: 800px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 16px;
 }
@@ -432,7 +432,7 @@ function handleLogout() {
 }
 
 .input-container {
-  max-width: 800px;
+  max-width: 920px;
   margin: 0 auto;
   display: flex;
   align-items: flex-end;
@@ -450,7 +450,7 @@ function handleLogout() {
 }
 
 .input-hint {
-  max-width: 800px;
+  max-width: 920px;
   margin: 6px auto 0;
   font-size: 12px;
   color: var(--color-text-placeholder);
