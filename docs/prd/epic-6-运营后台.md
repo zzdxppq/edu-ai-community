@@ -1,0 +1,305 @@
+# Epic 6: 运营后台
+
+**Epic Summary:** 构建完整的运营管理后台，包括知识库CRUD管理、文件上传与解析触发、脱敏审核、用户反馈处理、对话日志查看与分析、常用问题和角色推荐内容配置管理。
+
+**Target Repositories:** monolith
+
+```yaml
+epic_id: 6
+title: "运营后台"
+description: |
+  构建运营管理后台的完整前端界面和对应API。整合前面各Epic中运营相关的功能，
+  提供统一的管理入口。包括：知识库管理、文件上传、脱敏审核、反馈处理、
+  对话日志分析、内容配置。
+
+stories:
+  - id: "6.1"
+    title: "运营后台框架与权限"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "后台登录与权限隔离"
+        scenario:
+          given: "运营人员账号"
+          when: "运营人员登录后台"
+          then:
+            - "运营后台独立登录入口"
+            - "普通用户无法访问后台页面"
+            - "后台导航包含所有管理功能模块入口"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "运营账号由超管创建，不支持自行注册"
+          - id: "BR-1.2"
+            rule: "后台API接口验证运营权限，普通用户Token无法调用"
+        error_handling:
+          - scenario: "普通用户尝试访问后台"
+            code: "403"
+            message: "无权限访问"
+            action: "重定向到用户端首页"
+
+    provides_apis:
+      - "POST /api/admin/auth/login"
+    consumes_apis: []
+    dependencies: ["1.1"]
+
+  - id: "6.2"
+    title: "知识库管理界面"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "知识条目CRUD"
+        scenario:
+          given: "运营人员登录后台"
+          when: "进入知识库管理页"
+          then:
+            - "显示知识条目列表（支持搜索、筛选、分页），列表中显示每条知识的可见角色标签"
+            - "支持新增、编辑、删除知识条目"
+            - "支持查看知识条目的来源（文件上传/问答沉淀/用户问题）"
+            - "新增/编辑知识条目时须选择可见角色（多选），默认全部角色可见"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "删除操作需二次确认"
+          - id: "BR-1.2"
+            rule: "编辑后自动重新向量化"
+          - id: "BR-1.3"
+            rule: "可见角色为多选，可选值为6类用户角色，知识检索时按用户角色过滤"
+        error_handling:
+          - scenario: "删除已被引用的条目"
+            code: "N/A"
+            message: "N/A"
+            action: "软删除，标记为不可用但保留数据"
+
+      - id: AC2
+        title: "文件上传与解析"
+        scenario:
+          given: "运营人员在知识库管理页"
+          when: "上传新的PDF/Word文件"
+          then:
+            - "文件上传成功后自动触发解析管道"
+            - "上传时须选择该文件的可见角色（多选）"
+            - "显示解析进度和状态（解析中/成功/失败）"
+            - "解析完成后知识条目自动入库，继承文件的可见角色配置"
+            - "已上传文件列表提供'预览'按钮，点击可在线查看文件内容（PDF直接预览、Word转PDF预览）"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "支持批量上传，单文件大小≤50MB"
+          - id: "BR-2.2"
+            rule: "仅支持.pdf和.docx格式"
+          - id: "BR-2.3"
+            rule: "文件在线预览使用PDF.js或类似方案，Word文件服务端转换为PDF后预览"
+        error_handling:
+          - scenario: "文件格式不支持"
+            code: "422"
+            message: "仅支持PDF和Word(.docx)文件"
+            action: "拒绝上传，提示正确格式"
+          - scenario: "解析失败"
+            code: "N/A"
+            message: "文件解析失败"
+            action: "显示错误原因，允许重新上传"
+
+    provides_apis:
+      - "GET /api/admin/knowledge"
+      - "POST /api/admin/knowledge"
+      - "PUT /api/admin/knowledge/{id}"
+      - "DELETE /api/admin/knowledge/{id}"
+    consumes_apis:
+      - "POST /api/admin/documents/upload"
+    dependencies: ["6.1", "2.1"]
+
+  - id: "6.3"
+    title: "反馈管理与对话日志"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P1
+
+    acceptance_criteria:
+      - id: AC1
+        title: "用户反馈管理"
+        scenario:
+          given: "运营人员进入反馈管理页"
+          when: "查看用户反馈列表"
+          then:
+            - "显示所有反馈记录（评分、原因、用户信息、时间）"
+            - "支持按评分筛选、按时间排序"
+            - "可查看关联的完整对话上下文"
+            - "对于用户'提交专家处理'的问题，可标记处理状态"
+            - "标记为'已完成'时，必须弹出长文本输入弹框，运营填写处理结果内容后方可完成标记"
+            - "处理结果内容将展示给提交反馈的用户（在用户端'反馈记录'页面查看）"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "专家处理状态：待处理、处理中、已完成"
+          - id: "BR-1.2"
+            rule: "已完成的处理结果可选择同步至知识库，同步时默认状态为'审核通过'（无需二次审核），因为运营已在回复中确认了内容质量"
+          - id: "BR-1.3"
+            rule: "标记完成时处理结果为必填长文本（不少于10个字符），弹框使用 textarea 支持多行输入"
+          - id: "BR-1.5"
+            rule: "'加入知识库'按钮仅在运营已回复内容后才可用（必须先回复才能加入知识库）"
+          - id: "BR-1.4"
+            rule: "用户端反馈记录页显示：反馈状态、原始问题摘要、处理结果文本、处理时间"
+        error_handling:
+          - scenario: "关联对话已被删除"
+            code: "N/A"
+            message: "对话记录不可用"
+            action: "显示反馈信息，标注对话不可查看"
+
+      - id: AC2
+        title: "对话日志与基础分析"
+        scenario:
+          given: "运营人员进入对话日志页"
+          when: "查看对话数据"
+          then:
+            - "显示对话记录列表（用户、时间、消息条数、评分）"
+            - "可展开查看完整对话内容"
+            - "提供基础统计：日活用户数、日对话数、平均评分、热门问题Top10"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "日志数据支持按日期范围筛选"
+          - id: "BR-2.2"
+            rule: "热门问题基于用户问题语义聚类统计"
+        error_handling:
+          - scenario: "统计数据量过大"
+            code: "N/A"
+            message: "N/A"
+            action: "分页加载，统计数据异步计算并缓存"
+
+    provides_apis:
+      - "GET /api/admin/feedback"
+      - "PUT /api/admin/feedback/{id}/status"
+      - "PUT /api/admin/feedback/{id}/resolve"
+      - "GET /api/admin/conversations"
+      - "GET /api/admin/analytics"
+      - "GET /api/feedback/my-records"
+    consumes_apis: []
+    dependencies: ["6.1", "5.1"]
+
+  - id: "6.4"
+    title: "内容配置管理"
+    repository_type: monolith
+    estimated_complexity: low
+    priority: P1
+
+    acceptance_criteria:
+      - id: AC1
+        title: "快捷问题配置"
+        scenario:
+          given: "运营人员进入内容配置页"
+          when: "管理常用问题快捷菜单"
+          then:
+            - "显示当前配置的快捷问题列表"
+            - "支持新增、编辑、删除、排序"
+            - "修改即时生效（用户刷新后可见）"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "最多配置20个快捷问题，前端展示取前8个"
+          - id: "BR-1.2"
+            rule: "支持拖拽排序"
+        error_handling:
+          - scenario: "保存失败"
+            code: "500"
+            message: "保存失败，请重试"
+            action: "保留编辑状态，允许重新提交"
+
+      - id: AC2
+        title: "角色推荐内容配置"
+        scenario:
+          given: "运营人员在内容配置页"
+          when: "配置某角色的推荐内容"
+          then:
+            - "按角色Tab展示各角色的推荐问题和资源列表"
+            - "支持为每个角色独立配置推荐内容"
+            - "支持新增、编辑、删除、排序"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "6个角色各自独立配置"
+          - id: "BR-2.2"
+            rule: "每个角色最多配置15条推荐内容"
+        error_handling:
+          - scenario: "某角色配置为空"
+            code: "N/A"
+            message: "N/A"
+            action: "该角色用户看到通用推荐内容"
+
+    provides_apis:
+      - "GET /api/admin/config/quick-questions"
+      - "PUT /api/admin/config/quick-questions"
+      - "GET /api/admin/config/role-recommendations/{role}"
+      - "PUT /api/admin/config/role-recommendations/{role}"
+    consumes_apis: []
+    dependencies: ["6.1"]
+
+  - id: "6.5"
+    title: "推荐问题管理"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "推荐问题CRUD管理"
+        scenario:
+          given: "运营人员进入推荐问题管理页"
+          when: "管理推荐问题列表"
+          then:
+            - "按角色Tab展示各角色的推荐问题列表"
+            - "每条推荐问题包含：问题文本 + 答案文本（一问一答格式）"
+            - "支持新增、编辑、删除、排序推荐问题"
+            - "支持为每个角色独立配置不同的推荐问题"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "6个用户角色各自独立管理推荐问题"
+          - id: "BR-1.2"
+            rule: "每个角色最多配置30条推荐问题"
+          - id: "BR-1.3"
+            rule: "推荐问题在对话框下方区域展示（非侧边栏），默认展示6条，支持'换一批'刷新"
+          - id: "BR-1.4"
+            rule: "用户点击推荐问题后，直接展示运营预设的标准答案（不触发AI推理）"
+        error_handling:
+          - scenario: "某角色推荐问题为空"
+            code: "N/A"
+            message: "N/A"
+            action: "该角色用户不显示推荐问题区域"
+          - scenario: "保存失败"
+            code: "500"
+            message: "保存失败，请重试"
+            action: "保留编辑状态，允许重新提交"
+
+      - id: AC2
+        title: "前端推荐问题展示"
+        scenario:
+          given: "用户已登录并进入对话界面"
+          when: "对话区为空（新会话）"
+          then:
+            - "对话区域中间展示6个推荐问题卡片"
+            - "下方显示'换一批'按钮，点击随机刷新展示另外6条"
+            - "用户点击推荐问题后，问题和预设答案以对话气泡形式展示"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "推荐问题按用户角色过滤，展示该角色下的推荐问题"
+          - id: "BR-2.2"
+            rule: "'换一批'从该角色全部推荐问题中随机选取6条，不与当前展示的重复"
+          - id: "BR-2.3"
+            rule: "推荐问题不足6条时全部展示，不显示'换一批'按钮"
+        error_handling:
+          - scenario: "推荐问题加载失败"
+            code: "N/A"
+            message: "N/A"
+            action: "仅显示欢迎语和输入框"
+
+    provides_apis:
+      - "GET /api/admin/recommended-questions"
+      - "GET /api/admin/recommended-questions/{role}"
+      - "POST /api/admin/recommended-questions"
+      - "PUT /api/admin/recommended-questions/{id}"
+      - "DELETE /api/admin/recommended-questions/{id}"
+      - "GET /api/recommended-questions"
+    consumes_apis: []
+    dependencies: ["6.1"]
+```
+
+---

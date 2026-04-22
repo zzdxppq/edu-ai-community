@@ -15,18 +15,18 @@ project:
     assigned_stories: []
 prd:
   prdFile: docs/prd.md
-  prdSharded: false
+  prdSharded: true
   prdShardedLocation: docs/prd
 architecture:
-  architectureFile: docs/architecture.md
-  architectureSharded: false
-  architectureShardedLocation: docs/architecture
-  storyReviewsLocation: docs/architecture/story-reviews
+  architectureFile: docs/fullstack-architecture.md
+  architectureSharded: true
+  architectureShardedLocation: docs/fullstack-architecture
+  storyReviewsLocation: docs/fullstack-architecture/story-reviews
 customTechnicalDocuments: null
 devLoadAlwaysFiles:
-  - docs/architecture/*coding-standards.md
-  - docs/architecture/*tech-stack.md
-  - docs/architecture/*source-tree.md
+  - docs/fullstack-architecture/*coding-standards.md
+  - docs/fullstack-architecture/*tech-stack.md
+  - docs/fullstack-architecture/*source-tree.md
 devDebugLog: .ai/debug-log.md
 devStoryLocation: docs/stories
 verticalSliceStrategy: true
@@ -34,7 +34,7 @@ dev:
   devLogLocation: docs/dev/logs
   devLogEnabled: true
 architect:
-  storyReviewsLocation: docs/architecture/story-reviews
+  storyReviewsLocation: docs/fullstack-architecture/story-reviews
 qa:
   qaLocation: docs/qa
   qaReviewsLocation: docs/qa/reviews

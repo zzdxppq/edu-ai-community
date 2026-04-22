@@ -1,0 +1,266 @@
+epic_id: 1
+title: "基础设施与用户系统"
+description: |
+  建立项目基础设施（前后端框架、数据库、缓存），实现完整的用户系统，
+  包括手机号注册/登录、角色选择、JWT认证保持登录、使用日志记录。
+  此Epic是所有后续功能的基础依赖。
+
+stories:
+  - id: "1.1"
+    title: "项目初始化与基础架构搭建"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "后端项目初始化"
+        scenario:
+          given: "空项目仓库"
+          when: "开发人员执行项目初始化"
+          then:
+            - "Spring Boot 3.x + Spring Cloud 微服务项目结构创建完成，包含 Controller、Service、Repository 分层目录"
+            - "PostgreSQL数据库连接配置完成（Spring Data JPA）"
+            - "Redis 7 连接配置完成（Spring Data Redis）"
+            - "健康检查接口 GET /api/health 返回200（Spring Boot Actuator）"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "项目采用 JDK 21 + Spring Boot 3.x + Spring Cloud 微服务框架，按业务拆分1-2个服务模块"
+          - id: "BR-1.2"
+            rule: "数据库使用PostgreSQL + pgvector扩展"
+          - id: "BR-1.3"
+            rule: "使用Flyway进行数据库迁移管理"
+        error_handling:
+          - scenario: "数据库连接失败"
+            code: "503"
+            message: "服务暂时不可用"
+            action: "启动时检查连接，失败则记录日志并退出"
+
+      - id: AC2
+        title: "前端项目初始化"
+        scenario:
+          given: "空项目仓库"
+          when: "开发人员执行前端初始化"
+          then:
+            - "前端项目结构创建完成（Vue 3 + Element Plus）"
+            - "Vue Router 路由配置、Pinia 状态管理、Axios HTTP请求封装完成"
+            - "开发环境可正常启动并显示首页"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "前端技术栈确认为 Vue 3 + Element Plus + Pinia + Vue Router"
+          - id: "BR-2.2"
+            rule: "需支持响应式布局（桌面端+移动端）"
+        error_handling:
+          - scenario: "后端API不可达"
+            code: "NETWORK_ERROR"
+            message: "服务连接中，请稍后重试"
+            action: "前端显示友好提示，不暴露技术细节"
+
+    provides_apis:
+      - "GET /api/health"
+    consumes_apis: []
+    dependencies: []
+
+  - id: "1.2"
+    title: "手机号注册与角色选择"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "手机号注册"
+        scenario:
+          given: "用户未注册"
+          when: "用户输入手机号、验证码、用户名、选择角色并提交注册"
+          then:
+            - "用户记录创建到数据库"
+            - "密码/验证码安全处理"
+            - "返回注册成功并引导登录"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "手机号必须唯一，不可重复注册"
+          - id: "BR-1.2"
+            rule: "角色为必选项，可选值：区域教育管理人员、校共体核心牵头校人员、校共体成员校人员（城镇）、校共体成员校人员（乡村）、研究人员、其他人员"
+          - id: "BR-1.3"
+            rule: "用户名为必填项，2-20个字符"
+        data_validation:
+          - field: "phone"
+            type: "string"
+            required: true
+            rules: "中国大陆手机号格式，11位数字，1开头"
+            error_message: "请输入正确的手机号"
+          - field: "sms_code"
+            type: "string"
+            required: true
+            rules: "6位数字验证码，5分钟有效期"
+            error_message: "验证码错误或已过期"
+          - field: "username"
+            type: "string"
+            required: true
+            rules: "2-20个字符"
+            error_message: "用户名需2-20个字符"
+          - field: "role"
+            type: "string"
+            required: true
+            rules: "枚举值，必须为6种角色之一"
+            error_message: "请选择您的角色身份"
+        error_handling:
+          - scenario: "手机号已注册"
+            code: "409"
+            message: "该手机号已注册，请直接登录"
+            action: "返回错误，提供登录入口链接"
+          - scenario: "验证码错误"
+            code: "400"
+            message: "验证码错误或已过期，请重新获取"
+            action: "清空验证码输入框，允许重新获取"
+          - scenario: "短信发送失败"
+            code: "503"
+            message: "短信发送失败，请稍后重试"
+            action: "记录日志，60秒后允许重新发送"
+        interaction:
+          - trigger: "点击获取验证码"
+            behavior: "发送短信，按钮变为60秒倒计时"
+          - trigger: "提交注册"
+            behavior: "显示加载状态，成功后跳转登录页"
+        examples:
+          - input: "手机号: 13800138000, 验证码: 123456, 用户名: 张老师, 角色: 校共体成员校人员（乡村）"
+            expected: "注册成功，跳转至登录页"
+
+      - id: AC2
+        title: "角色选择界面"
+        scenario:
+          given: "用户在注册页面"
+          when: "用户进入角色选择步骤"
+          then:
+            - "展示6种角色选项，每个角色附带简短说明"
+            - "用户选择后角色标签高亮"
+            - "角色选择结果随注册信息一起提交"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "必须选择且只能选择一个角色"
+          - id: "BR-2.2"
+            rule: "角色选择后可在个人设置中修改"
+        error_handling:
+          - scenario: "未选择角色直接提交"
+            code: "400"
+            message: "请选择您的角色身份"
+            action: "角色选择区域高亮提示"
+
+    provides_apis:
+      - "POST /api/auth/send-sms"
+      - "POST /api/auth/register"
+    consumes_apis: []
+    dependencies: ["1.1"]
+
+  - id: "1.3"
+    title: "登录与会话管理"
+    repository_type: monolith
+    estimated_complexity: medium
+    priority: P0
+
+    acceptance_criteria:
+      - id: AC1
+        title: "手机号登录"
+        scenario:
+          given: "用户已注册"
+          when: "用户输入手机号和验证码登录"
+          then:
+            - "验证通过后生成JWT Token（access_token + refresh_token）"
+            - "access_token有效期2小时，refresh_token有效期7天"
+            - "登录时间记录到用户日志"
+            - "跳转至主对话界面"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "登录方式为手机号+短信验证码"
+          - id: "BR-1.2"
+            rule: "access_token过期后自动使用refresh_token刷新，用户无感知"
+          - id: "BR-1.3"
+            rule: "refresh_token过期后需重新登录"
+          - id: "BR-1.4"
+            rule: "记录每次登录的时间、IP、设备信息"
+        data_validation:
+          - field: "phone"
+            type: "string"
+            required: true
+            rules: "中国大陆手机号格式"
+            error_message: "请输入正确的手机号"
+          - field: "sms_code"
+            type: "string"
+            required: true
+            rules: "6位数字验证码"
+            error_message: "验证码错误或已过期"
+        error_handling:
+          - scenario: "手机号未注册"
+            code: "404"
+            message: "该手机号未注册，请先注册"
+            action: "提供注册入口链接"
+          - scenario: "验证码错误"
+            code: "401"
+            message: "验证码错误或已过期"
+            action: "允许重新获取验证码"
+          - scenario: "频繁登录尝试"
+            code: "429"
+            message: "登录尝试过于频繁，请5分钟后再试"
+            action: "临时锁定5分钟"
+        examples:
+          - input: "POST /api/auth/login {phone: '13800138000', sms_code: '123456'}"
+            expected: "200 OK {access_token: 'jwt...', refresh_token: 'jwt...', user: {id, username, role}}"
+
+      - id: AC2
+        title: "Token自动刷新与会话保持"
+        scenario:
+          given: "用户已登录且access_token即将过期"
+          when: "前端发起API请求"
+          then:
+            - "自动使用refresh_token获取新的access_token"
+            - "用户无感知，请求正常完成"
+        business_rules:
+          - id: "BR-2.1"
+            rule: "前端在access_token剩余5分钟时主动刷新"
+          - id: "BR-2.2"
+            rule: "refresh_token刷新时同时更新refresh_token（滑动过期）"
+        error_handling:
+          - scenario: "refresh_token已过期"
+            code: "401"
+            message: "登录已过期，请重新登录"
+            action: "清除本地Token，跳转至登录页"
+
+    provides_apis:
+      - "POST /api/auth/login"
+      - "POST /api/auth/refresh"
+      - "POST /api/auth/logout"
+    consumes_apis: []
+    dependencies: ["1.1", "1.2"]
+
+  - id: "1.4"
+    title: "用户使用日志记录"
+    repository_type: monolith
+    estimated_complexity: low
+    priority: P1
+
+    acceptance_criteria:
+      - id: AC1
+        title: "对话日志自动记录"
+        scenario:
+          given: "用户已登录并进行对话"
+          when: "用户发送消息或收到智能体回复"
+          then:
+            - "每条消息（用户询问和智能体回复）记录到数据库"
+            - "记录包含：用户ID、会话ID、消息角色（user/assistant）、消息内容、时间戳"
+        business_rules:
+          - id: "BR-1.1"
+            rule: "对话按会话（session）组织，每次新对话创建新会话"
+          - id: "BR-1.2"
+            rule: "日志数据保留期限至少1年"
+        error_handling:
+          - scenario: "日志写入失败"
+            code: "N/A"
+            message: "不影响用户对话"
+            action: "异步写入，失败时记录错误日志，不中断对话"
+
+    provides_apis:
+      - "GET /api/conversations"
+      - "GET /api/conversations/{id}/messages"
+    consumes_apis: []
+    dependencies: ["1.3"]
