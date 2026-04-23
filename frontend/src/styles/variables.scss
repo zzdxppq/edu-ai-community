@@ -1,0 +1,58 @@
+// Story 1.1 — brand baseline + breakpoint tokens.
+// Consumed via var(--token-name) across all views. Source of truth for
+// later stories that introduce light/dark theming (Story 1.8+).
+
+:root {
+  // Brand palette (ref: docs/front-end-spec.md §6.2)
+  --color-brand: #1a73e8;
+  --color-brand-dark: #1152a8;
+  --color-accent: #ff8f1f;
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+
+  // Text
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #4b5563;
+  --color-text-muted: #6b7280;
+
+  // Surface
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f9fafb;
+  --color-border: #e5e7eb;
+
+  // Typography (ref: §6.4)
+  --font-family-sans: 'PingFang SC', 'Helvetica Neue', system-ui, sans-serif;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 28px;
+
+  // Spacing
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  // Radius (ref: §6.8)
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+
+  // Breakpoints (ref: §8.1)
+  --bp-mobile: 768px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1280px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+}

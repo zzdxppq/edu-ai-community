@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: edu-gateway
+  cloud:
+    gateway:
+      routes:
+        # Routes to edu-core / edu-ai are declared by later stories once
+        # downstream endpoints exist. Story 1.1 only needs the gateway's
+        # own /api/health to be reachable.
+        []
+
+management:
+  endpoints:
+    web:
+      base-path: /api
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.edu.ai: INFO

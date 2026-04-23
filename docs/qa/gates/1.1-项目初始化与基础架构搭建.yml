@@ -1,0 +1,123 @@
+schema_version: 1
+story_id: "1.1"
+story_slug: 项目初始化与基础架构搭建
+epic_id: 1
+review_round: 1
+review_date: 2026-04-23
+reviewer: QA (宋慈)
+gate: PASS
+final_status: Done
+
+risk_assessment:
+  level: LOW
+  review_mode: automated_only
+  skip_e2e: true
+  rationale: |
+    Foundation infrastructure story — non-security-sensitive, no business logic,
+    no data mutation. Only user-facing surfaces are /api/health and a placeholder
+    home page, both covered by automated tests. Story Dev Notes explicitly defer
+    E2E to Phase C Smoke Test (see T9/T10 + testing-strategy.md).
+
+test_results:
+  automated_tests:
+    verification_method: independent_execution
+    backend:
+      command: "mvn -f backend/pom.xml -B test"
+      modules_built: 5
+      reactor: SUCCESS
+      tests_run: 12
+      passed: 10
+      skipped: 2
+      failed: 0
+      skipped_reason: "FlywayMigrationTest @Testcontainers(disabledWithoutDocker=true) — docker unavailable in sandbox; CI will execute."
+    frontend:
+      command: "npm --prefix frontend test (vitest run)"
+      test_files: 4
+      tests_run: 8
+      passed: 8
+      failed: 0
+    aggregate:
+      total_executable: 20
+      passed: 18
+      skipped: 2
+      failed: 0
+      pass_rate_of_executed: 100.0
+    integrity_check:
+      dev_claimed: "18 pass / 2 skip / 0 fail"
+      qa_observed: "18 pass / 2 skip / 0 fail"
+      discrepancy: false
+
+  ac_coverage:
+    coverage_rate: 100.0
+    total_acs: 2
+    fully_verified: 2
+    placeholder_issues: 0
+    details:
+      AC1:
+        code_locations: 15
+        test_locations: 12
+        aspects: {main_scenario: true, business_rules: true, data_validation: true, error_handling: true}
+        status: VERIFIED
+      AC2:
+        code_locations: 9
+        test_locations: 8
+        aspects: {main_scenario: true, business_rules: true, data_validation: N/A, error_handling: true}
+        status: VERIFIED
+
+  blind_spot:
+    total_scenarios: 8
+    covered: 8
+    missing_code: 0
+    missing_test: 0
+    coverage_rate: 100.0
+    by_category: {BOUNDARY: 2/2, ERROR: 4/4, FLOW: 1/1, RESOURCE: 1/1}
+
+  regression:
+    executed: false
+    reason: "Story 1.1 is the first story in the project — no prior E2E tests exist."
+
+  e2e:
+    executed: false
+    skipped: true
+    reason: "LOW risk + automated_only review mode; Dev Notes defers to Phase C Smoke Test."
+
+architect_low_issues_absorbed:
+  - "CREATE EXTENSION privilege: V1__init_extensions.sql DBA-note comment + IF NOT EXISTS + DO block"
+  - "edu-common dependency: gateway/core/ai pom.xml all declare <artifactId>edu-common</artifactId>"
+  - "Gateway health aggregation: routes=[] + base-path=/api only; no custom HealthIndicator"
+
+issues:
+  critical: []
+  high: []
+  medium: []
+  low:
+    - id: LOW-1
+      finding: "Duplicated nested path 'backend/backend/...' contains orphan .gitkeep package placeholders (edu-core: admin/auth/chat/feedback/feign/config; edu-ai: 13 sub-packages; edu-gateway: filter). Correct source-tree location is 'backend/{module}/...' (already populated with real code). These orphan files do not affect build/test/runtime."
+      root_cause_hypothesis: "Script or command ran with CWD already inside 'backend/', then referenced 'backend/{module}/...' creating the nested duplicate."
+      severity: LOW
+      impact: "Repository hygiene only; no functional impact."
+      action: "Excluded from Story 1.1 commit via 'git reset HEAD backend/backend/'. Dev to delete 'backend/backend/' in Story 1.2 cleanup or when adding code to any of those packages."
+      gate_effect: "Does NOT change gate verdict (PASS). LOW issues inform future work, do not block."
+
+reasoning: |
+  Independent Maven + Vitest execution reproduces Dev-claimed 18 pass / 2 skip / 0 fail
+  with zero discrepancy. AC Traceability Matrix is fully populated (no placeholders);
+  100% AC coverage verified by mapping 20 test locations to 2 ACs across main/business
+  /validation/error aspects. All 8 blind-spot scenarios (including the 4 Error-handling
+  ones that guard PG fail-fast, Redis degradation, pgvector self-check, and frontend
+  friendly-error copy) have both code and test. All three Architect Low issues are
+  absorbed with on-disk evidence. No new or residual issues.
+
+next_status_decision:
+  from: Review
+  to: Done
+  valid: true
+
+incremental_context:
+  cached_risk_level: LOW
+  cached_review_mode: automated_only
+  cached_project_type: fullstack
+  failed_acs: []
+  failed_e2e_scenarios: []
+  missing_blind_spots: []
+  checkbox_issues: []

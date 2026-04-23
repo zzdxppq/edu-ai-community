@@ -9,3 +9,15 @@ dist/
 .youlidao-pod
 .mcp.json
 opencode.jsonc
+
+# Maven
+target/
+*.iml
+.idea/
+
+# Vite / Vitest build artefacts
+frontend/auto-imports.d.ts
+frontend/components.d.ts
+frontend/vite.config.js
+frontend/vite.config.d.ts
+frontend/tsconfig.node.tsbuildinfo
