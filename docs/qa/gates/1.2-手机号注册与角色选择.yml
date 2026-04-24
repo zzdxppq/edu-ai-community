@@ -1,0 +1,130 @@
+schema: 1
+story: "1.2"
+story_title: "手机号注册与角色选择"
+gate: PASS
+status_reason: "所有自动化测试执行通过（65/65 前后端 + 18 Docker-gated 集成优雅跳过）；AC 覆盖 100%；盲点场景 29/29 全覆盖；Architect Round 2 六项 Recommendations + L3 采纳全部落地。"
+reviewer: "宋慈 (QA)"
+updated: "2026-04-24"
+
+review_round: 1
+review_mode_type: full
+issues_from_previous_round: 0
+issues_resolved: 0
+improvement_percentage: 0
+
+incremental_context:
+  cached_risk_level: HIGH
+  cached_review_mode: full_testing
+  cached_project_type: fullstack
+  failed_acs: []
+  failed_e2e_scenarios: []
+  missing_blind_spots: []
+  checkbox_issues: []
+
+waiver: { active: false }
+
+architecture_concern: false
+escalation_reason: ""
+
+top_issues: []
+
+test_results:
+  automated:
+    executed: true
+    passed: true
+    total: 83
+    passed_count: 65
+    failed_count: 0
+    skipped_count: 18
+    pass_rate: 100
+    coverage_percentage: 0
+    failed_tests: []
+    skipped_tests_note: "18 个集成测试 Docker-gated（@Testcontainers(disabledWithoutDocker=true)），在沙箱 Docker 不可达环境下优雅跳过；测试已编译通过，CI 启用 Docker 时自动运行。"
+    backend:
+      command: "mvn -pl edu-core,edu-common -am test -B"
+      build_status: SUCCESS
+      tests_total: 52
+      tests_passed: 34
+      tests_skipped: 18
+      tests_failed: 0
+    frontend:
+      command: "npx vitest run"
+      build_status: SUCCESS
+      tests_total: 31
+      tests_passed: 31
+      tests_skipped: 0
+      tests_failed: 0
+  e2e:
+    executed: false
+    passed: true
+    skipped: true
+    skip_reason: "Per story test-design: E2E=0 (deferred to Phase C Smoke Test, aligned with 1.1 + testing-strategy.md)"
+    scenarios_tested: 0
+    scenarios_passed: 0
+    scenarios_failed: 0
+    console_errors_found: false
+    network_errors_found: false
+
+evidence:
+  directory: "docs/qa/evidence/1.2/"
+  issues: []
+  note: "No issues found — evidence directory not populated."
+
+risk_assessment:
+  risk_level: HIGH
+  review_mode: full_testing
+  complexity_count: 5
+  security_sensitive: true
+  dev_gate_score: 96
+
+risk_summary:
+  totals:
+    critical: 0
+    high: 0
+    medium: 0
+    low: 0
+  recommendations:
+    must_fix: []
+    monitor:
+      - action: "AuthController.sendSms 捕获 RuntimeException 并统一映射为 503，未来可收窄为 DataAccessException / RedisConnectionFailureException 避免吞掉无关运行时异常。"
+        refs: ["backend/edu-core/src/main/java/com/edu/ai/core/auth/controller/AuthController.java:36-39"]
+      - action: "User entity 在 @PrePersist 中主动生成 UUID 与 DDL DEFAULT gen_random_uuid() 构成双重保险，功能正确但冗余；若未来统一使用 DB 生成可简化代码。"
+        refs: ["backend/edu-core/src/main/java/com/edu/ai/core/auth/entity/User.java:66-81"]
+
+coverage:
+  ac:
+    total: 2
+    fully_verified: 2
+    partially_verified: 0
+    not_verified: 0
+    coverage_rate: 100
+  task_checkboxes:
+    total: 66
+    checked: 66
+    unchecked: 0
+    completion_rate: 100
+    consistency_rate: 100
+  blind_spots:
+    total: 29
+    covered: 29
+    missing_code: 0
+    missing_test: 0
+    coverage_rate: 100
+    categories:
+      BOUNDARY: 10
+      ERROR: 5
+      FLOW: 4
+      CONCURRENCY: 3
+      DATA: 4
+      RESOURCE: 3
+
+architect_recommendations_verification:
+  sms_replay_protection: PASS
+  rate_limit_bypass_guard: PASS
+  concurrent_same_phone_register: "PASS (unit); Docker-gated integration ready for CI"
+  sensitive_data_containment: PASS
+  xss_sqli_defense: PASS
+  testcontainers_graceful_skip: PASS
+  L3_sms_void_signature: PASS
+
+next_story_id: "1.3"

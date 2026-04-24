@@ -7,6 +7,11 @@ const routes: RouteRecordRaw[] = [
     name: 'Home',
     component: HomeView,
   },
+  {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/auth/RegisterView.vue'),
+  },
 ];
 
 const router = createRouter({

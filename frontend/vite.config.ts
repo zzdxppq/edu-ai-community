@@ -28,5 +28,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     include: ['tests/**/*.spec.ts'],
+    css: false,
+    server: {
+      deps: {
+        inline: [/element-plus/],
+      },
+    },
   },
 });
